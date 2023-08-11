@@ -31,10 +31,19 @@ const skillTree = {
       label: "Skill C",
       details: "Details about Skill C",
     },
+    {
+      id: 4,
+      x: 300,
+      y: 500,
+      radius: 30,
+      label: "Skill D",
+      details: "Details about Skill D",
+    },
   ],
   connections: [
     { node1Id: 1, node2Id: 2 },
     { node1Id: 2, node2Id: 3 },
+    { node1Id: 2, node2Id: 4 },
   ],
 };
 
