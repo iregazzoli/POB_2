@@ -1,4 +1,5 @@
 const svg = document.getElementById("skill-tree");
+const NODESIZE = 50;
 
 // Define the getImageUrl function
 function getImageUrl(nodeId) {
@@ -11,31 +12,31 @@ const skillTree = {
       id: 1,
       x: 100,
       y: 100,
-      radius: 30,
+      radius: NODESIZE,
       label: "Skill A",
       details: "Details about Skill A",
     },
     {
       id: 2,
-      x: 300,
-      y: 300,
-      radius: 30,
+      x: 400,
+      y: 400,
+      radius: NODESIZE,
       label: "Skill B",
       details: "Details about Skill B",
     },
     {
       id: 3,
-      x: 500,
-      y: 300,
-      radius: 30,
+      x: 900,
+      y: 400,
+      radius: NODESIZE,
       label: "Skill C",
       details: "Details about Skill C",
     },
     {
       id: 4,
-      x: 300,
-      y: 500,
-      radius: 30,
+      x: 400,
+      y: 800,
+      radius: NODESIZE,
       label: "Skill D",
       details: "Details about Skill D",
     },
@@ -57,7 +58,7 @@ function drawLine(x1, y1, x2, y2, node1Id, node2Id) {
   svgLine.setAttribute("x2", x2);
   svgLine.setAttribute("y2", y2);
   svgLine.setAttribute("stroke", "black");
-  svgLine.setAttribute("stroke-width", 3);
+  svgLine.setAttribute("stroke-width", 7);
   svgLine.setAttribute("stroke-linecap", "round");
   svgLine.setAttribute("data-node1", node1Id);
   svgLine.setAttribute("data-node2", node2Id);
