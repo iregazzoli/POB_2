@@ -26,21 +26,3 @@ document.addEventListener("mousemove", (e) => {
 document.addEventListener("mouseup", () => {
   isDragging = false;
 });
-
-// Update nodes positions on scroll
-// document.addEventListener("mousemove", (e) => {
-//   if (!isDragging) return;
-
-//   const deltaX = e.clientX - startX;
-//   const deltaY = e.clientY - startY;
-
-//   viewport.scrollLeft = startScrollX - deltaX;
-//   viewport.scrollTop = startScrollY - deltaY;
-
-//   // Update SVG node positions
-//   skillNodes.forEach((node) => {
-//     const svgNode = document.querySelector(`circle[data-id="${node.id}"]`);
-//     svgNode.setAttribute("cx", node.x - deltaX);
-//     svgNode.setAttribute("cy", node.y - deltaY);
-//   });
-// });

@@ -68,3 +68,8 @@ body {
   z-index: 1;
 }
 
+.learned-skill{
+  filter: grayscale(100%);
+}
+
+

@@ -64,9 +64,14 @@ function createSkillNode(node) {
   svgNode.setAttribute("y", node.y - node.radius);
   svgNode.setAttribute("width", node.radius * 2);
   svgNode.setAttribute("height", node.radius * 2);
+  svgNode.classList.add("learned-skill");
 
   const imageUrl = getImageUrl(node.id);
   svgNode.setAttribute("href", imageUrl);
+
+  svgNode.addEventListener("click", () => {
+    svgNode.classList.toggle("learned-skill");
+  });
 
   svg.appendChild(svgNode);
 }
