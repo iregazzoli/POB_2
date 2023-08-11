@@ -48,8 +48,6 @@ body {
 
 #viewport {
   flex: 1;
-  /* width: 60em; 
-  height: 0em; */
   overflow: hidden;
   position: relative;
 }
@@ -60,7 +58,6 @@ body {
   position: absolute;
 }
 
-/* SKILL TREE */
 /* SKILL TREE */
 #skill-tree {
   position: absolute;
