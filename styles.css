@@ -68,8 +68,14 @@ body {
   z-index: 1;
 }
 
-.learned-skill{
+.unlearned-skill{
   filter: grayscale(100%);
+}
+
+.illuminated {
+  stroke: gold; 
+  stroke-width: 3;
+  stroke-opacity: 0.7;
 }
 
 

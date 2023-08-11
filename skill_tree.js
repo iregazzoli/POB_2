@@ -24,10 +24,10 @@ const skillTree = {
       details: "Details about Skill B",
     },
   ],
-  connections: [{ source: 1, target: 2 }],
+  connections: [{ node1Id: 1, node2Id: 2 }],
 };
 
-function drawLine(x1, y1, x2, y2) {
+function drawLine(x1, y1, x2, y2, node1Id, node2Id) {
   const svgLine = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "line"
@@ -39,19 +39,61 @@ function drawLine(x1, y1, x2, y2) {
   svgLine.setAttribute("stroke", "black");
   svgLine.setAttribute("stroke-width", 3);
   svgLine.setAttribute("stroke-linecap", "round");
+  svgLine.setAttribute("data-node1", node1Id);
+  svgLine.setAttribute("data-node2", node2Id);
   svg.appendChild(svgLine);
+  return svgLine;
 }
 
-function createEdges() {
+//TODO: think a better name bc this returns an edge only if both skills are learned
+//TODO: refactor this later
+function getEdgeSvgElement(node1Id, node2Id) {
+  const edges = svg.querySelectorAll("line");
+  for (const edge of edges) {
+    const edgeNode1Id = parseInt(edge.getAttribute("data-node1"));
+    const edgeNode2Id = parseInt(edge.getAttribute("data-node2"));
+
+    if (
+      (edgeNode1Id === node1Id || edgeNode1Id === node2Id) &&
+      (edgeNode2Id === node1Id || edgeNode2Id === node2Id)
+    ) {
+      const node1 = svg.querySelector(`[id="${edgeNode1Id}"]`);
+      const node2 = svg.querySelector(`[id="${edgeNode2Id}"]`);
+
+      if (
+        node1 &&
+        node2 &&
+        !node1.classList.contains("unlearned-skill") &&
+        !node2.classList.contains("unlearned-skill")
+      ) {
+        return edge;
+      }
+    }
+  }
+  return null;
+}
+
+function updateEdgeEffect(svgLine) {
+  svgLine.classList.toggle("illuminated");
+}
+
+function updateEdgeEffects(clickedNodeId) {
   skillTree.connections.forEach((connection) => {
-    const sourceNode = skillTree.nodes.find(
-      (node) => node.id === connection.source
-    );
-    const targetNode = skillTree.nodes.find(
-      (node) => node.id === connection.target
-    );
-    drawLine(sourceNode.x, sourceNode.y, targetNode.x, targetNode.y);
+    if (
+      connection.node1Id == clickedNodeId ||
+      connection.node2Id == clickedNodeId
+    ) {
+      const svgLine = getEdgeSvgElement(connection.node1Id, connection.node2Id);
+      if (svgLine) updateEdgeEffect(svgLine);
+    }
   });
+}
+
+// Define the createEdge function
+function createEdge(connection) {
+  const node1 = skillTree.nodes.find((node) => node.id === connection.node1Id);
+  const node2 = skillTree.nodes.find((node) => node.id === connection.node2Id);
+  drawLine(node1.x, node1.y, node2.x, node2.y, node1.id, node2.id);
 }
 
 function createSkillNode(node) {
@@ -64,27 +106,18 @@ function createSkillNode(node) {
   svgNode.setAttribute("y", node.y - node.radius);
   svgNode.setAttribute("width", node.radius * 2);
   svgNode.setAttribute("height", node.radius * 2);
-  svgNode.classList.add("learned-skill");
+  svgNode.classList.add("unlearned-skill");
+  svgNode.setAttribute("id", node.id);
 
   const imageUrl = getImageUrl(node.id);
   svgNode.setAttribute("href", imageUrl);
 
   svgNode.addEventListener("click", () => {
-    svgNode.classList.toggle("learned-skill");
+    svgNode.classList.toggle("unlearned-skill");
+    updateEdgeEffects(node.id);
   });
 
   svg.appendChild(svgNode);
-}
-
-// Define the createEdge function
-function createEdge(connection) {
-  const sourceNode = skillTree.nodes.find(
-    (node) => node.id === connection.source
-  );
-  const targetNode = skillTree.nodes.find(
-    (node) => node.id === connection.target
-  );
-  drawLine(sourceNode.x, sourceNode.y, targetNode.x, targetNode.y);
 }
 
 skillTree.connections.forEach(createEdge);
