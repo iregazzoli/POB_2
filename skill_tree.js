@@ -77,20 +77,12 @@ function getEdgeSvgElement(node1Id, node2Id) {
         !node1.classList.contains("unlearned-skill") &&
         !node2.classList.contains("unlearned-skill")
       ) {
-        illuminateEdge(edge);
+        edge.classList.add("illuminated");
       } else {
-        deilluminateEdge(edge);
+        edge.classList.remove("illuminated");
       }
     }
   }
-}
-
-function illuminateEdge(svgLine) {
-  svgLine.classList.add("illuminated");
-}
-
-function deilluminateEdge(svgLine) {
-  svgLine.classList.remove("illuminated");
 }
 
 function updateEdgeEffects(clickedNodeId) {
