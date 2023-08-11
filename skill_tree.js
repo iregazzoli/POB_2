@@ -58,7 +58,7 @@ function drawLine(x1, y1, x2, y2, node1Id, node2Id) {
 
 //TODO: think a better name bc this returns an edge only if both skills are learned
 //TODO: refactor this later
-function getEdgeSvgElement(node1Id, node2Id) {
+function updateEdgeEffect(node1Id, node2Id) {
   const edges = svg.querySelectorAll("line");
   for (const edge of edges) {
     const edgeNode1Id = parseInt(edge.getAttribute("data-node1"));
@@ -91,7 +91,7 @@ function updateEdgeEffects(clickedNodeId) {
       connection.node1Id == clickedNodeId ||
       connection.node2Id == clickedNodeId
     ) {
-      getEdgeSvgElement(connection.node1Id, connection.node2Id);
+      updateEdgeEffect(connection.node1Id, connection.node2Id);
     }
   });
 }
