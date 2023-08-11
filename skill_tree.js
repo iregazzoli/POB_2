@@ -99,14 +99,7 @@ function updateEdgeEffects(clickedNodeId) {
       connection.node1Id == clickedNodeId ||
       connection.node2Id == clickedNodeId
     ) {
-      const svgLine = getEdgeSvgElement(connection.node1Id, connection.node2Id);
-      if (svgLine) {
-        if (svgLine.classList.contains("illuminated")) {
-          deilluminateEdge(svgLine);
-        } else {
-          illuminateEdge(svgLine);
-        }
-      }
+      getEdgeSvgElement(connection.node1Id, connection.node2Id);
     }
   });
 }
