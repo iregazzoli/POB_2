@@ -23,8 +23,19 @@ const skillTree = {
       label: "Skill B",
       details: "Details about Skill B",
     },
+    {
+      id: 3,
+      x: 500,
+      y: 300,
+      radius: 30,
+      label: "Skill C",
+      details: "Details about Skill C",
+    },
   ],
-  connections: [{ node1Id: 1, node2Id: 2 }],
+  connections: [
+    { node1Id: 1, node2Id: 2 },
+    { node1Id: 2, node2Id: 3 },
+  ],
 };
 
 function drawLine(x1, y1, x2, y2, node1Id, node2Id) {
