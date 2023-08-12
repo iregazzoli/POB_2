@@ -40,13 +40,65 @@ const skillTree = {
       name: "Skill D",
       details: "Details about Skill D",
     },
+    {
+      id: 5,
+      x: 700,
+      y: 900,
+      radius: NODESIZE,
+      name: "Skill E",
+      details: "Details about Skill E",
+    },
+    {
+      id: 6,
+      x: 1200,
+      y: 400,
+      radius: NODESIZE,
+      name: "Skill F",
+      details: "Details about Skill F",
+    },
+    {
+      id: 7,
+      x: 1050,
+      y: 700,
+      radius: NODESIZE,
+      name: "Skill G",
+      details: "Details about Skill G",
+    },
+    {
+      id: 8,
+      x: 100,
+      y: 900,
+      radius: NODESIZE,
+      name: "Skill H",
+      details: "Details about Skill H",
+    },
+    {
+      id: 9,
+      x: 1150,
+      y: 1180,
+      radius: NODESIZE,
+      name: "Skill I",
+      details: "Details about Skill I",
+    },
   ],
   connections: [
     { node1Id: 1, node2Id: 2 },
     { node1Id: 2, node2Id: 3 },
     { node1Id: 2, node2Id: 4 },
+
+    { node1Id: 4, node2Id: 5 },
+    { node1Id: 4, node2Id: 8 },
+    { node1Id: 5, node2Id: 9 },
+
+    { node1Id: 3, node2Id: 6 },
+    { node1Id: 3, node2Id: 7 },
+    { node1Id: 6, node2Id: 7 },
+
+    { node1Id: 7, node2Id: 9 },
   ],
 };
+
+// | Edges |
 
 function drawLine(x1, y1, x2, y2, node1Id, node2Id) {
   const svgLine = document.createElementNS(
@@ -113,6 +165,88 @@ function createEdge(connection) {
   drawLine(node1.x, node1.y, node2.x, node2.y, node1.id, node2.id);
 }
 
+// | Nodes |
+
+const learnedNodes = new Set();
+
+function learnNode(nodeId) {
+  const svgNode = document.getElementById(nodeId);
+  if (svgNode) {
+    svgNode.classList.remove("unlearned-skill");
+    learnedNodes.add(nodeId);
+  }
+}
+
+function unlearnNode(nodeId) {
+  const svgNode = document.getElementById(nodeId);
+  if (svgNode) {
+    svgNode.classList.add("unlearned-skill");
+    learnedNodes.delete(nodeId);
+  }
+}
+
+function learnNode(nodeId) {
+  const svgNode = document.getElementById(nodeId);
+  if (svgNode) {
+    svgNode.classList.remove("unlearned-skill");
+    learnedNodes.add(nodeId);
+  }
+}
+
+function unlearnNode(nodeId) {
+  const svgNode = document.getElementById(nodeId);
+  if (svgNode) {
+    svgNode.classList.add("unlearned-skill");
+    learnedNodes.delete(nodeId);
+  }
+}
+
+function isLearned(nodeId) {
+  return learnedNodes.has(nodeId);
+}
+
+function findShortestPath(startNodeId, targetNodeId, visited) {
+  if (startNodeId === targetNodeId) {
+    return [startNodeId];
+  }
+
+  visited.add(startNodeId);
+
+  for (const connection of skillTree.connections) {
+    if (
+      connection.node1Id === startNodeId &&
+      !visited.has(connection.node2Id)
+    ) {
+      const path = findShortestPath(connection.node2Id, targetNodeId, visited);
+      if (path.length) {
+        path.unshift(startNodeId);
+        return path;
+      }
+    }
+    if (
+      connection.node2Id === startNodeId &&
+      !visited.has(connection.node1Id)
+    ) {
+      const path = findShortestPath(connection.node1Id, targetNodeId, visited);
+      if (path.length) {
+        path.unshift(startNodeId);
+        return path;
+      }
+    }
+  }
+
+  return [];
+}
+
+function learnPath(path) {
+  for (let i = 0; i < path.length - 1; i++) {
+    learnNode(path[i]);
+    updateEdgeEffects(path[i]);
+  }
+  learnNode(path[path.length - 1]);
+  updateEdgeEffects(path[path.length - 1]);
+}
+
 function createSkillNode(node) {
   const svgNode = document.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -132,6 +266,17 @@ function createSkillNode(node) {
 
   svgNode.addEventListener("click", () => {
     svgNode.classList.toggle("unlearned-skill");
+    if (svgNode.classList.contains("unlearned-skill")) {
+      unlearnNode(node.id);
+    } else {
+      learnNode(node.id);
+      const shortestPath = findShortestPath(
+        node.id,
+        Array.from(learnedNodes)[0],
+        new Set()
+      );
+      learnPath(shortestPath);
+    }
     updateEdgeEffects(node.id);
   });
 
