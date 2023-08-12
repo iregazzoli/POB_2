@@ -78,4 +78,31 @@ body {
   stroke-opacity: 0.7;
 }
 
+/* TOOLTIP */
+#tooltip {
+  position: absolute;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.tooltip-name {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.tooltip-line {
+  border: 1px solid #ff9900;
+  margin: 5px 0;
+}
+
+.tooltip-details {
+  font-size: 14px;
+  color: #00bfff;
+}
 

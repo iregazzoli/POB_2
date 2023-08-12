@@ -13,7 +13,7 @@ const skillTree = {
       x: 100,
       y: 100,
       radius: NODESIZE,
-      label: "Skill A",
+      name: "Skill A",
       details: "Details about Skill A",
     },
     {
@@ -21,7 +21,7 @@ const skillTree = {
       x: 400,
       y: 400,
       radius: NODESIZE,
-      label: "Skill B",
+      name: "Skill B",
       details: "Details about Skill B",
     },
     {
@@ -29,7 +29,7 @@ const skillTree = {
       x: 900,
       y: 400,
       radius: NODESIZE,
-      label: "Skill C",
+      name: "Skill C",
       details: "Details about Skill C",
     },
     {
@@ -37,7 +37,7 @@ const skillTree = {
       x: 400,
       y: 800,
       radius: NODESIZE,
-      label: "Skill D",
+      name: "Skill D",
       details: "Details about Skill D",
     },
   ],
@@ -125,6 +125,7 @@ function createSkillNode(node) {
   svgNode.setAttribute("height", node.radius * 2);
   svgNode.classList.add("unlearned-skill");
   svgNode.setAttribute("id", node.id);
+  svgNode.setAttribute("data-details", node.details);
 
   const imageUrl = getImageUrl(node.id);
   svgNode.setAttribute("href", imageUrl);
@@ -135,6 +136,29 @@ function createSkillNode(node) {
   });
 
   svg.appendChild(svgNode);
+
+  // Handle hover effect
+  svgNode.addEventListener("mouseover", (event) => {
+    svgNode.setAttribute("width", node.radius * 2.2);
+    svgNode.setAttribute("height", node.radius * 2.2);
+
+    // Show and update the tooltip
+    const tooltip = document.getElementById("tooltip");
+    tooltip.querySelector(".tooltip-name").textContent = node.name;
+    tooltip.querySelector(".tooltip-details").textContent = node.details;
+    tooltip.style.left = `${event.clientX}px`;
+    tooltip.style.top = `${event.clientY}px`;
+    tooltip.style.display = "block";
+  });
+
+  svgNode.addEventListener("mouseout", () => {
+    svgNode.setAttribute("width", node.radius * 2);
+    svgNode.setAttribute("height", node.radius * 2);
+
+    // Hide the tooltip
+    const tooltip = document.getElementById("tooltip");
+    tooltip.style.display = "none";
+  });
 }
 
 skillTree.connections.forEach(createEdge);
