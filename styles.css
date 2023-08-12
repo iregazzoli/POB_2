@@ -1,0 +1,13 @@
+#container {
+  display: flex;
+  height: 100vh; /* Set the wrapper height to the full viewport height */
+  background-color: #f0f0f0; /* Optional background color for the body */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Set the size of the canvas */
+#skillTreeMainCanvas {
+  width: 900px; /* Set the width to match the stage width */
+  height: 800px; /* Set the height to match the stage height */
+}
