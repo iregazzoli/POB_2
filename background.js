@@ -1,9 +1,12 @@
 const stageWidth = 900;
 const stageHeight = 800;
 const backgroundImageSrc = "assets/background.png";
-const iconImageSrc = "assets/group-background.png";
-const skillsSrc = "assets/skills.png";
-const frameSrc = "assets/frame.png";
+const sources = {
+  iconImage: "assets/group-background.png",
+  skills: "assets/skills.png",
+  disabledSkills: "assets/skills-disabled.png",
+  frame: "assets/frame.png",
+};
 
 const log = console.log;
 
@@ -66,32 +69,45 @@ function loadBackground() {
   backgroundImage.src = backgroundImageSrc;
 }
 
-function loadIcons() {
-  const iconImage = new Image();
-  iconImage.onload = function () {
-    // Create a Konva Image from the cropped icon canvas
-    let konvaIconImage = new Konva.Image({
-      image: iconImage,
-      x: 1000,
-      y: 1000,
-      width: 240,
-      height: 220,
-      offsetX: 120,
-      offsetY: 110,
-    });
+function loadImages(imageSources, callback) {
+  const images = {};
+  let loadedImages = 0;
+  const numImages = Object.keys(imageSources).length;
 
-    konvaIconImage.crop({
-      x: 0,
-      y: 220,
-      width: 240,
-      height: 220,
-    });
+  for (const name in imageSources) {
+    images[name] = new Image();
+    images[name].onload = function () {
+      if (++loadedImages >= numImages) {
+        callback(images);
+      }
+    };
+    images[name].src = imageSources[name];
+  }
+}
 
-    layer.add(konvaIconImage); // Add the cropped icon image to the layer
-    layer.draw(); // Redraw the layer
-  };
+function drawClassIcons(images) {
+  const iconImage = images.iconImage;
 
-  iconImage.src = iconImageSrc; // Start loading the icon image
+  // Create a Konva Image from the cropped icon canvas
+  let konvaIconImage = new Konva.Image({
+    image: iconImage,
+    x: 1000,
+    y: 1000,
+    width: 240,
+    height: 220,
+    offsetX: 120,
+    offsetY: 110,
+  });
+
+  konvaIconImage.crop({
+    x: 0,
+    y: 220,
+    width: 240,
+    height: 220,
+  });
+
+  layer.add(konvaIconImage); // Add the cropped icon image to the layer
+  layer.draw(); // Redraw the layer
 }
 
 const skillTree = {
@@ -205,7 +221,7 @@ const skillTree = {
   },
 };
 
-function drawNodeFrame(nodeSprite, nodeX, nodeY) {
+function drawNodeFrame(nodeSprite, nodeX, nodeY, images) {
   let frameX;
   let frameY;
   let frameWidth;
@@ -218,40 +234,34 @@ function drawNodeFrame(nodeSprite, nodeX, nodeY) {
     frameHeight = 50;
   }
 
-  const nodeFrame = new Image();
-  nodeFrame.onload = function () {
-    let frameKonva = new Konva.Image({
-      image: nodeFrame,
-      x: nodeX + 3,
-      y: nodeY + 2,
-      width: 50,
-      height: 50,
-      offsetX: 25,
-      offsetY: 25,
-    });
+  const nodeFrame = images.frame;
+  let frameKonva = new Konva.Image({
+    image: nodeFrame,
+    x: nodeX + 3,
+    y: nodeY + 2,
+    width: 50,
+    height: 50,
+    offsetX: 25,
+    offsetY: 25,
+  });
 
-    frameKonva.crop({
-      x: 325,
-      y: 231,
-      width: 45,
-      height: 45,
-    });
+  frameKonva.crop({
+    x: 325,
+    y: 231,
+    width: 45,
+    height: 45,
+  });
 
-    layer.add(frameKonva);
-    // layer.draw();
-  };
-
-  nodeFrame.src = frameSrc;
+  layer.add(frameKonva);
+  layer.draw();
 }
 
-function drawGroupNodes(nodos, groupX, groupY) {
-  log(groupX, groupY);
-
+function drawGroupNodes(nodos, groupX, groupY, images) {
   const radius = 35;
   for (const nodeId of nodos) {
     const node = skillTree.nodes[nodeId];
     // log("node: ", node);
-    const nodeSprite = skillTree.sprites[node.name];
+    const nodeSpriteData = skillTree.sprites[node.name];
     // log("nodeSprite: ", nodeSprite);
 
     //Node position
@@ -287,36 +297,52 @@ function drawGroupNodes(nodos, groupX, groupY) {
     const nodeY = Math.round(groupY - radius * node.orbit * Math.sin(angle));
 
     //Node icon
-    const nodeImg = new Image();
-    nodeImg.onload = function () {
-      let nodeKonva = new Konva.Image({
-        image: nodeImg,
-        x: nodeX,
-        y: nodeY,
-        width: nodeSprite.w,
-        height: nodeSprite.h,
-        //centers image in the x and y coordinates
-        offsetX: nodeSprite.w / 2,
-        offsetY: nodeSprite.h / 2,
-      });
+    const nodeImg = images.disabledSkills;
+    let nodeKonva = new Konva.Image({
+      image: nodeImg,
+      x: nodeX,
+      y: nodeY,
+      width: nodeSpriteData.w,
+      height: nodeSpriteData.h,
+      //centers image in the x and y coordinates
+      offsetX: nodeSpriteData.w / 2,
+      offsetY: nodeSpriteData.h / 2,
+    });
 
-      nodeKonva.crop({
-        x: nodeSprite.x - nodeSprite.w,
-        y: nodeSprite.y - nodeSprite.h,
-        width: nodeSprite.w,
-        height: nodeSprite.h,
-      });
+    nodeKonva.crop({
+      x: nodeSpriteData.x - nodeSpriteData.w,
+      y: nodeSpriteData.y - nodeSpriteData.h,
+      width: nodeSpriteData.w,
+      height: nodeSpriteData.h,
+    });
 
-      layer.add(nodeKonva);
-    };
-    nodeImg.src = skillsSrc;
+    layer.add(nodeKonva);
 
-    drawNodeFrame(nodeSprite, nodeX, nodeY);
+    nodeKonva.on("click", () => {
+      log("clicked");
+      if (nodeKonva.image().src === skillsSrc) {
+        nodeKonva.image(nodeImg);
+        nodeKonva.image().src = disabledSkillsSrc;
+      } else {
+        nodeKonva.image(nodeImg);
+        nodeKonva.image().src = skillsSrc;
+      }
+
+      // Redraw the layer after changing the image
+      layer.draw();
+    });
+
+    nodeKonva.cache();
+    nodeKonva.drawHitFromCache();
+
+    // // Cache and drawHitFromCache for more precise event detection
+
+    drawNodeFrame(nodeSpriteData, nodeX, nodeY, images);
     layer.draw();
   }
 }
 
-function drawGroup(group) {
+function drawGroup(group, images) {
   let imageX;
   let imageY;
   if (group.background.image === "PSGroupBackground2") {
@@ -324,45 +350,43 @@ function drawGroup(group) {
     imageY = 290;
   }
 
-  const groupBackground = new Image();
-  groupBackground.onload = function () {
-    let groupBackgroundKonva = new Konva.Image({
-      image: groupBackground,
-      x: group.x,
-      y: group.y,
-      width: 180,
-      height: 175,
-      offsetX: 90,
-      offsetY: 87.5,
-    });
-    groupBackgroundKonva.crop({
-      x: imageX,
-      y: imageY,
-      width: 205,
-      height: 180,
-    });
+  const groupBackground = images.iconImage;
+  let groupBackgroundKonva = new Konva.Image({
+    image: groupBackground,
+    x: group.x,
+    y: group.y,
+    width: 180,
+    height: 175,
+    offsetX: 90,
+    offsetY: 87.5,
+  });
+  groupBackgroundKonva.crop({
+    x: imageX,
+    y: imageY,
+    width: 205,
+    height: 180,
+  });
 
-    layer.add(groupBackgroundKonva);
-    layer.draw();
+  layer.add(groupBackgroundKonva);
+  layer.draw();
 
-    //TODO: re do this but with out hardcoded values
-    drawGroupNodes(group.nodes, group.x, group.y);
-    // group.nodes is the array of the ids of nodes in the group
-  };
-
-  groupBackground.src = iconImageSrc;
+  //TODO: re do this but with out hardcoded values
+  drawGroupNodes(group.nodes, group.x, group.y, images);
+  // group.nodes is the array of the ids of nodes in the group
 }
 
-function drawTree(skillTree) {
+function drawTree(skillTree, images) {
   for (let group in skillTree.groups) {
     let groupData = skillTree.groups[group];
-    drawGroup(groupData);
+    drawGroup(groupData, images);
   }
 }
 
 loadBackground();
-loadIcons();
-drawTree(skillTree);
+loadImages(sources, (loadedImages) => {
+  drawClassIcons(loadedImages);
+  drawTree(skillTree, loadedImages);
+});
 
 //Zooming feature
 //source: https://colinwren.medium.com/adding-zoom-and-panning-to-your-react-konva-stage-3e0a38c31d38
