@@ -266,18 +266,6 @@ function drawGroupNodes(nodos, groupX, groupY) {
         angle = (6 + aux) * (Math.PI / 3);
       }
     } else if (node.orbit === 2 || node.orbit === 3) {
-      log(
-        "skill:" +
-          node.skill +
-          " name: " +
-          node.name +
-          " orbit:" +
-          node.orbit +
-          " index:" +
-          node.orbitIndex +
-          " angle:" +
-          orbitDegrees[node.orbitIndex]
-      );
       angle = orbitDegrees[node.orbitIndex] * (Math.PI / 180);
     } else if (node.orbit === 4) {
       let aux = 10 - node.orbitIndex;
@@ -297,8 +285,6 @@ function drawGroupNodes(nodos, groupX, groupY) {
 
     const nodeX = Math.round(groupX + radius * node.orbit * Math.cos(angle));
     const nodeY = Math.round(groupY - radius * node.orbit * Math.sin(angle));
-
-    log("nodeX: ", nodeX, "nodeY: ", nodeY, "angle: ", angle);
 
     //Node icon
     const nodeImg = new Image();
