@@ -1,6 +1,6 @@
 const stageWidth = 900;
 const stageHeight = 800;
-const backgroundImageSrc = "assets/phos.png";
+const backgroundImageSrc = "assets/background.png";
 const iconImageSrc = "assets/group-background.png";
 const skillsSrc = "assets/skills.png";
 const frameSrc = "assets/frame.png";
@@ -76,6 +76,8 @@ function loadIcons() {
       y: 1000,
       width: 240,
       height: 220,
+      offsetX: 120,
+      offsetY: 110,
     });
 
     konvaIconImage.crop({
@@ -95,8 +97,8 @@ function loadIcons() {
 const skillTree = {
   groups: {
     1: {
-      x: 1400,
-      y: 1040,
+      x: 1500,
+      y: 1000,
       orbits: [0, 2],
       background: {
         image: "PSGroupBackground2",
@@ -220,10 +222,12 @@ function drawNodeFrame(nodeSprite, nodeX, nodeY) {
   nodeFrame.onload = function () {
     let frameKonva = new Konva.Image({
       image: nodeFrame,
-      x: nodeX - 8,
-      y: nodeY - 8,
+      x: nodeX + 3,
+      y: nodeY + 2,
       width: 50,
       height: 50,
+      offsetX: 25,
+      offsetY: 25,
     });
 
     frameKonva.crop({
@@ -241,7 +245,9 @@ function drawNodeFrame(nodeSprite, nodeX, nodeY) {
 }
 
 function drawGroupNodes(nodos, groupX, groupY) {
-  const radius = 50;
+  log(groupX, groupY);
+
+  const radius = 35;
   for (const nodeId of nodos) {
     const node = skillTree.nodes[nodeId];
     // log("node: ", node);
@@ -260,6 +266,18 @@ function drawGroupNodes(nodos, groupX, groupY) {
         angle = (6 + aux) * (Math.PI / 3);
       }
     } else if (node.orbit === 2 || node.orbit === 3) {
+      log(
+        "skill:" +
+          node.skill +
+          " name: " +
+          node.name +
+          " orbit:" +
+          node.orbit +
+          " index:" +
+          node.orbitIndex +
+          " angle:" +
+          orbitDegrees[node.orbitIndex]
+      );
       angle = orbitDegrees[node.orbitIndex] * (Math.PI / 180);
     } else if (node.orbit === 4) {
       let aux = 10 - node.orbitIndex;
@@ -278,9 +296,9 @@ function drawGroupNodes(nodos, groupX, groupY) {
     }
 
     const nodeX = Math.round(groupX + radius * node.orbit * Math.cos(angle));
-    const nodeY = Math.round(groupY + radius * node.orbit * Math.sin(angle));
+    const nodeY = Math.round(groupY - radius * node.orbit * Math.sin(angle));
 
-    // log("nodeX: ", nodeX, "nodeY: ", nodeY, "angle: ", angle);
+    log("nodeX: ", nodeX, "nodeY: ", nodeY, "angle: ", angle);
 
     //Node icon
     const nodeImg = new Image();
@@ -291,6 +309,9 @@ function drawGroupNodes(nodos, groupX, groupY) {
         y: nodeY,
         width: nodeSprite.w,
         height: nodeSprite.h,
+        //centers image in the x and y coordinates
+        offsetX: nodeSprite.w / 2,
+        offsetY: nodeSprite.h / 2,
       });
 
       nodeKonva.crop({
@@ -323,20 +344,23 @@ function drawGroup(group) {
       image: groupBackground,
       x: group.x,
       y: group.y,
-      width: 200,
-      height: 180,
+      width: 180,
+      height: 175,
+      offsetX: 90,
+      offsetY: 87.5,
     });
     groupBackgroundKonva.crop({
       x: imageX,
       y: imageY,
-      width: 215,
+      width: 205,
       height: 180,
     });
 
     layer.add(groupBackgroundKonva);
     layer.draw();
 
-    drawGroupNodes(group.nodes, group.x + imageX / 2, group.y + imageY / 2);
+    //TODO: re do this but with out hardcoded values
+    drawGroupNodes(group.nodes, group.x, group.y);
     // group.nodes is the array of the ids of nodes in the group
   };
 
@@ -359,7 +383,7 @@ drawTree(skillTree);
 
 const zoomScaleBy = 1.3;
 const minScale = 0.3; //zoom out limit
-const maxScale = 5; //zoom in limit
+const maxScale = 2; //zoom in limit
 
 function zoomStage(event) {
   event.evt.preventDefault();
@@ -374,7 +398,6 @@ function zoomStage(event) {
 
   // Apply zoom limits
   const clampedScale = Math.min(maxScale, Math.max(minScale, newScale));
-  log("clampedScale", clampedScale);
 
   stage.scale({ x: clampedScale, y: clampedScale });
 
