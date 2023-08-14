@@ -1,6 +1,6 @@
 const stageWidth = 900;
 const stageHeight = 800;
-const backgroundImageSrc = "assets/background.png";
+const backgroundImageSrc = "assets/phos.png";
 const iconImageSrc = "assets/group-background.png";
 const skillsSrc = "assets/skills.png";
 const frameSrc = "assets/frame.png";
@@ -18,6 +18,7 @@ const stage = new Konva.Stage({
   container: "skillTreeMainCanvas",
   width: stageWidth,
   height: stageHeight,
+  perfectDrawEnabled: false,
 });
 
 const layer = new Konva.Layer();
@@ -182,7 +183,7 @@ const skillTree = {
       in: ["62831"],
     },
   },
-  //this is not like the json
+  //TODO: this is not like the json
   sprites: {
     "Attack and Cast Speed": {
       x: 806,
@@ -243,9 +244,9 @@ function drawGroupNodes(nodos, groupX, groupY) {
   const radius = 50;
   for (const nodeId of nodos) {
     const node = skillTree.nodes[nodeId];
-    log("node: ", node);
+    // log("node: ", node);
     const nodeSprite = skillTree.sprites[node.name];
-    log("nodeSprite: ", nodeSprite);
+    // log("nodeSprite: ", nodeSprite);
 
     //Node position
     let angle;
@@ -279,7 +280,7 @@ function drawGroupNodes(nodos, groupX, groupY) {
     const nodeX = Math.round(groupX + radius * node.orbit * Math.cos(angle));
     const nodeY = Math.round(groupY + radius * node.orbit * Math.sin(angle));
 
-    log("nodeX: ", nodeX, "nodeY: ", nodeY, "angle: ", angle);
+    // log("nodeX: ", nodeX, "nodeY: ", nodeY, "angle: ", angle);
 
     //Node icon
     const nodeImg = new Image();
@@ -352,3 +353,38 @@ function drawTree(skillTree) {
 loadBackground();
 loadIcons();
 drawTree(skillTree);
+
+//Zooming feature
+//source: https://colinwren.medium.com/adding-zoom-and-panning-to-your-react-konva-stage-3e0a38c31d38
+
+const zoomScaleBy = 1.3;
+const minScale = 0.3; //zoom out limit
+const maxScale = 5; //zoom in limit
+
+function zoomStage(event) {
+  event.evt.preventDefault();
+  const oldScale = stage.scaleX();
+  const { x: pointerX, y: pointerY } = stage.getPointerPosition();
+  const mousePointTo = {
+    x: (pointerX - stage.x()) / oldScale,
+    y: (pointerY - stage.y()) / oldScale,
+  };
+  const newScale =
+    event.evt.deltaY > 0 ? oldScale / zoomScaleBy : oldScale * zoomScaleBy;
+
+  // Apply zoom limits
+  const clampedScale = Math.min(maxScale, Math.max(minScale, newScale));
+  log("clampedScale", clampedScale);
+
+  stage.scale({ x: clampedScale, y: clampedScale });
+
+  const newPos = {
+    x: pointerX - mousePointTo.x * clampedScale,
+    y: pointerY - mousePointTo.y * clampedScale,
+  };
+  stage.position(newPos);
+
+  stage.batchDraw();
+}
+
+stage.on("wheel", zoomStage);
